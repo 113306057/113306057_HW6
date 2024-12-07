@@ -1,0 +1,194 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>1A2B Game</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background: #B0C4DE;
+            color: #333;
+        }
+
+        h1 {
+            text-align: center;
+            color: #fff;
+            margin-top: 20px;
+        }
+
+        .game-container {
+            max-width: 600px;
+            margin: 30px auto;
+            background: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .input-section {
+            margin-bottom: 20px;
+        }
+
+        #userGuess {
+            padding: 10px;
+            width: calc(100% - 110px);
+            font-size: 16px;
+            margin-right: 10px;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            box-sizing: border-box;
+        }
+
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            color: #fff;
+            background-color: #A9A9A9;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        button:hover {
+            background-color: #C0C0C0;
+        }
+
+        .alert {
+            color: red;
+            font-weight: bold;
+            margin: 10px 0;
+        }
+
+        #results {
+            margin-top: 20px;
+        }
+
+        #guessList li {
+            margin: 5px 0;
+            padding: 8px;
+            background: #f9f9f9;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            list-style: none;
+        }
+
+        .reset-btn {
+            margin-top: 20px;
+            padding: 10px 20px;
+            font-size: 16px;
+            color: #fff;
+            background-color: #f44336;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .reset-btn:hover {
+            background-color: #d32f2f;
+        }
+    </style>
+</head>
+<body>
+    <h1>113306057_HW6_1A2B</h1>
+    <div class="game-container">
+        <div class="input-section">
+            <input type="text" id="userGuess" placeholder="輸入 4 個不重複數字">
+            <button onclick="checkGuess()">提交答案</button>
+        </div>
+        <p id="message" class="alert"></p>
+        <p>作答次數：<span id="attempts">0</span></p>
+        <div id="results">
+            <h3>結果記錄：</h3>
+            <ul id="guessList"></ul>
+        </div>
+    </div>
+    <script>
+        
+        let answer = generateAnswer();
+let attempts = 0;
+
+function generateAnswer() {
+    const digits = Array.from({ length: 10 }, (_, i) => i.toString());
+    const answerArray = [];
+    while (answerArray.length < 4) {
+        const randomIndex = Math.floor(Math.random() * digits.length);
+        answerArray.push(digits[randomIndex]);
+        digits.splice(randomIndex, 1); // 移除已選數字
+    }
+    return answerArray.join('');
+}
+
+function checkGuess() {
+    const userGuess = document.getElementById("userGuess").value;
+    const message = document.getElementById("message");
+    const guessList = document.getElementById("guessList");
+
+    // 檢查輸入格式
+    if (userGuess.length !== 4) {
+        message.textContent = "請輸入正好 4 個數字！";
+        return;
+    }
+    if (!/^\d{4}$/.test(userGuess)) {
+        message.textContent = "請輸入 4 個數字！";
+        return;
+    }
+    if (hasDuplicates(userGuess)) {
+        message.textContent = "輸入的數字不能重複！";
+        return;
+    }
+
+    // 計算結果
+    let A = 0, B = 0;
+    for (let i = 0; i < 4; i++) {
+        if (userGuess[i] === answer[i]) {
+            A++;
+        } else if (answer.includes(userGuess[i])) {
+            B++;
+        }
+    }
+
+    attempts++;
+    document.getElementById("attempts").textContent = attempts;
+    guessList.innerHTML += `<li>${userGuess}: <strong>${A}A${B}B</strong></li>`;
+    message.textContent = "";
+
+    if (A === 4) {
+        alert(`恭喜！你猜對了！總共作答次數：${attempts}`);
+        resetGame();
+    }
+
+    // 清空輸入框
+    document.getElementById("userGuess").value = '';
+}
+
+function hasDuplicates(str) {
+    return new Set(str).size !== str.length;
+}
+
+function resetGame() {
+    answer = generateAnswer();
+    attempts = 0;
+    document.getElementById("attempts").textContent = attempts;
+    document.getElementById("guessList").innerHTML = '';
+    document.getElementById("message").textContent = '';
+    console.log(`新遊戲開始！答案是：${answer}`);
+}
+
+// 增加 Enter 按鍵支持
+document.getElementById("userGuess").addEventListener("keypress", function (event) {
+    if (event.key === "Enter") {
+        checkGuess();
+    }
+});
+
+// 測試階段顯示答案
+console.log(`答案是：${answer}`);
+    </script>
+</body>
+</html>
